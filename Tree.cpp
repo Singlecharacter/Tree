@@ -1,44 +1,4 @@
-#ifndef TREE_H
-#define TREE_H
-
-#include <iostream>
-
-template <class T> class node
-{
-public:
-
-    node();
-    ~node();
-
-    T value;
-
-    node<T> *left;
-    node<T> *right;
-
-};
-
-template <class T> class Tree
-{
-public:
-
-    Tree();
-    ~Tree();
-
-    void startInOrder();
-    void startPreOrder();
-    void startPostOrder();
-
-    bool add(T newValue);
-
-private:
-
-    void printInOrder(node<T> *start = NULL);
-    void printPreOrder(node<T> *start = NULL);
-    void printPostOrder(node<T> *start = NULL);
-
-    node<T> *root;
-
-};
+#include "tree.h"
 
 //Node methods
 template<class T> node<T>::node() : value(0), left(NULL), right(NULL)
@@ -51,8 +11,6 @@ template<class T> node<T>::~node()
     delete left;
     delete right;
 }
-
-//Tree methods
 
 template<class T> Tree<T>::Tree() : root(NULL)
 {
@@ -115,16 +73,6 @@ template<class T> void Tree<T>::startInOrder()
     printInOrder(root);
 }
 
-template<class T> void Tree<T>::startPreOrder()
-{
-    printPreOrder(root);
-}
-
-template<class T> void Tree<T>::startPostOrder()
-{
-    printPostOrder(root);
-}
-
 template<class T> void Tree<T>::printInOrder(node<T> *start)
 {
     if(start != NULL)
@@ -140,37 +88,3 @@ template<class T> void Tree<T>::printInOrder(node<T> *start)
         }
     }
 }
-
-template<class T> void Tree<T>::printPreOrder(node<T> *start)
-{
-    if(start != NULL)
-    {
-        std::cout << start->value << " ";
-        if(start->left != NULL)
-        {
-            printPreOrder(start->left);
-        }
-        if(start->right != NULL)
-        {
-            printPreOrder(start->right);
-        }
-    }
-}
-
-template<class T> void Tree<T>::printPostOrder(node<T> *start)
-{
-    if(start != NULL)
-    {
-        if(start->left != NULL)
-        {
-            printPostOrder(start->left);
-        }
-        if(start->right != NULL)
-        {
-            printPostOrder(start->right);
-        }
-        std::cout << start->value << " ";
-    }
-}
-
-#endif // TREE_H

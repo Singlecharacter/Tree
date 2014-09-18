@@ -90,3 +90,21 @@ bool getBool(std::string prompt = "")
     }
     return myBool;
 }
+
+char getChar(std::string prompt = "")
+{
+    while(true)
+    {
+        std::string temp = getString(prompt);
+        if(temp.length() > 1 || temp.length() == 0)
+        {
+            std::cout << "Error! That wasn't a character. Please enter a character.";
+            std::cin.sync();
+            std::cin.get();
+        }
+        else
+        {
+            return temp[0];
+        }
+    }
+}

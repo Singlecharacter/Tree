@@ -35,13 +35,17 @@ public:
 
     void removeValue(T val);
 
+    node<T> *addPostRoot(node<T> *n, T newVal);
+
+    int countChildren(node<T> *n, int num);
+
 private:
 
     void printInOrder(node<T> *start = NULL);
     void printPreOrder(node<T> *start = NULL);
     void printPostOrder(node<T> *start = NULL);
-    int getLeftWeight(node<T> *start, int w);
-    int getRightWeight(node<T> *start, int w);
+    int getLeftWeight(node<T> *start);
+    int getRightWeight(node<T> *start);
 
     node<T> *root;
     int leftWeight;
@@ -75,77 +79,118 @@ template<class T> Tree<T>::~Tree()
 
 template<class T> bool Tree<T>::add(T newValue)
 {
-    std::cout << getLeftWeight(root, 0) << std::endl;
-    std::cout << getRightWeight(root, 0) << std::endl;
+    bool successFlag = false;
 
     if(root == NULL)
     {
         root = new node<T>();
         root->value = newValue;
-        return true;
     }
     else
     {
-        node<T> *traverse = root;
-        while(true)
-        {
-            if(newValue < traverse->value)
-            {
-                if(traverse->left == NULL)
-                {
-                    traverse->left = new node<T>();
-                    traverse->left->value = newValue;
-                    return true;
-                }
-                else
-                {
-                    traverse = traverse->left;
-                }
-            }
-            else if(newValue > traverse->value)
-            {
-                if(traverse->right == NULL)
-                {
-                    traverse->right = new node<T>();
-                    traverse->right->value = newValue;
-                    return true;
-                }
-                else
-                {
-                    traverse = traverse->right;
-                }
-            }
-            else
-            {
-                return false;
-            }
-        }
+        root = addPostRoot(root,newValue);
     }
 
-    if(getRightWeight(root,0) > getLeftWeight(root, 0) + 1)
+    std::cout << "Left weight: " << getLeftWeight(root) << std::endl;
+    std::cout << "Right weight: " << getRightWeight(root) << std::endl;
+
+    return successFlag;
+}
+
+/*struct node* insert(struct node* node, int key)
+{
+    /* 1.  Perform the normal BST rotation
+    if (node == NULL)
+        return(newNode(key));
+
+    if (key < node->key)
+        node->left  = insert(node->left, key);
+    else
+        node->right = insert(node->right, key);
+
+    /* 2. Update height of this ancestor node
+    node->height = max(height(node->left), height(node->right)) + 1;
+
+    /* 3. Get the balance factor of this ancestor node to check whether
+       this node became unbalanced
+    int balance = getBalance(node);
+
+    // If this node becomes unbalanced, then there are 4 cases
+
+    // Left Left Case
+    if (balance > 1 && key < node->left->key)
+        return rightRotate(node);
+
+    // Right Right Case
+    if (balance < -1 && key > node->right->key)
+        return leftRotate(node);
+
+    // Left Right Case
+    if (balance > 1 && key > node->left->key)
     {
-        if(getLeftWeight(root->right,0) > getRightWeight(root->right,0) + 1)
-        {
-            rightRotate(root->right);
-            leftRotate(root);
-        }
-        else
-        {
-            leftRotate(root);
-        }
+        node->left =  leftRotate(node->left);
+        return rightRotate(node);
     }
-    else if(getLeftWeight(root,0) > getRightWeight(root, 0) + 1)
+
+    // Right Left Case
+    if (balance < -1 && key < node->right->key)
     {
-        if(getRightWeight(root->left,0) > getLeftWeight(root->left, 0) + 1)
-        {
-            leftRotate(root->left);
-            rightRotate(root);
-        }
-        else
-        {
-            rightRotate(root);
-        }
+        node->right = rightRotate(node->right);
+        return leftRotate(node);
     }
+
+    /* return the (unchanged) node pointer
+    return node;
+}*/
+
+template<class T> node<T> *Tree<T>::addPostRoot(node<T> *n, T newValue)
+{
+    if(n == NULL)
+    {
+        n = new node<T>();
+        n->value = newValue;
+        return n;
+    }
+
+    if(newValue < n->value)
+    {
+        n->left = addPostRoot(n->left,newValue);
+    }
+
+    if(newValue > n->value)
+    {
+        n->right = addPostRoot(n->right,newValue);
+    }
+
+    int balance = getLeftWeight(n) - getRightWeight(n);
+
+    //Left left
+    if(balance > 1 && newValue < n->left->value)
+    {
+        return rightRotate(n);
+    }
+
+    //Left Right
+    if(balance > 1 && newValue > n->left->value)
+    {
+        n->left = leftRotate(n->left);
+        return rightRotate(n);
+    }
+
+    //Right right
+    if(balance < -1 && newValue > n->right->value)
+    {
+        return leftRotate(n);
+    }
+
+    //Right left
+    if(balance < -1 && newValue < n->right->value)
+    {
+        n->right = rightRotate(n->right);
+        return leftRotate(n);
+    }
+
+    return n;
 }
 
 template<class T> void Tree<T>::startInOrder()
@@ -227,47 +272,42 @@ template<class T> node<T> *Tree<T>::rightRotate(node<T> *h)
     return temp;
 }
 
-template<class T> int Tree<T>::getLeftWeight(node<T> *start, int w)
+template<class T> int Tree<T>::getLeftWeight(node<T> *start)
 {
     if(start != NULL)
     {
-        if(start == root)
-        {
-            w = getLeftWeight(start->left, w);
-            w = getRightWeight(start->left, w);
-        }
-        else
-        {
-            w = w + 1;
-            w = getLeftWeight(start->left, w);
-            w = getRightWeight(start->left, w);
-            w = getLeftWeight(start->right, w);
-            w = getRightWeight(start->right, w);
-        }
+        int w = countChildren(start->left,0);
+
+        return w;
     }
 
-    return w;
+    return 0;
 }
 
-template<class T> int Tree<T>::getRightWeight(node<T> *start, int w)
+template<class T> int Tree<T>::getRightWeight(node<T> *start)
 {
     if(start != NULL)
     {
-        if(start == root)
-        {
-            w = getLeftWeight(start->right, w);
-            w = getRightWeight(start->right, w);
-        }
-        else
-        {
-            w = w + 1;
-            w = getLeftWeight(start->left, w);
-            w = getRightWeight(start->left, w);
-            w = getLeftWeight(start->right, w);
-            w = getRightWeight(start->right, w);
-        }
+        int w = countChildren(start->right,0);
+
+        return w;
     }
 
-    return w;
+    return 0;
 }
+
+template<class T> int Tree<T>::countChildren(node<T> *n, int num)
+{
+    if(n != NULL)
+    {
+        num++;
+        num = countChildren(n->left,num);
+        num = countChildren(n->right,num);
+    }
+    else
+    {
+        return num;
+    }
+}
+
 #endif // TREE_H

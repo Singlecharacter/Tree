@@ -43,6 +43,7 @@ int main()
             else
             {
                 myTree.add(input);
+                std::cout << "Hi";
             }
         }
 

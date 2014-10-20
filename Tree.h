@@ -35,8 +35,6 @@ public:
 
     void removeValue(T val);
 
-    node<T> *addPostRoot(node<T> *n, T newVal);
-
     int countChildren(node<T> *n, int num);
 
 private:
@@ -46,6 +44,10 @@ private:
     void printPostOrder(node<T> *start = NULL);
     int getLeftWeight(node<T> *start);
     int getRightWeight(node<T> *start);
+
+    node<T> *addPostRoot(node<T> *n, T newVal);
+    node<T> *removePostRoot(node<T> *n, T val);
+    node<T> *deleteNode(node<T> *n);
 
     node<T> *root;
     int leftWeight;
@@ -97,52 +99,6 @@ template<class T> bool Tree<T>::add(T newValue)
     return successFlag;
 }
 
-/*struct node* insert(struct node* node, int key)
-{
-    /* 1.  Perform the normal BST rotation
-    if (node == NULL)
-        return(newNode(key));
-
-    if (key < node->key)
-        node->left  = insert(node->left, key);
-    else
-        node->right = insert(node->right, key);
-
-    /* 2. Update height of this ancestor node
-    node->height = max(height(node->left), height(node->right)) + 1;
-
-    /* 3. Get the balance factor of this ancestor node to check whether
-       this node became unbalanced
-    int balance = getBalance(node);
-
-    // If this node becomes unbalanced, then there are 4 cases
-
-    // Left Left Case
-    if (balance > 1 && key < node->left->key)
-        return rightRotate(node);
-
-    // Right Right Case
-    if (balance < -1 && key > node->right->key)
-        return leftRotate(node);
-
-    // Left Right Case
-    if (balance > 1 && key > node->left->key)
-    {
-        node->left =  leftRotate(node->left);
-        return rightRotate(node);
-    }
-
-    // Right Left Case
-    if (balance < -1 && key < node->right->key)
-    {
-        node->right = rightRotate(node->right);
-        return leftRotate(node);
-    }
-
-    /* return the (unchanged) node pointer
-    return node;
-}*/
-
 template<class T> node<T> *Tree<T>::addPostRoot(node<T> *n, T newValue)
 {
     if(n == NULL)
@@ -191,6 +147,62 @@ template<class T> node<T> *Tree<T>::addPostRoot(node<T> *n, T newValue)
     }
 
     return n;
+}
+
+template<class T> void Tree<T>::removeValue(T val)
+{
+    if(root != NULL)
+    {
+        root = removePostRoot(root,val);
+    }
+
+    std::cout << "Left weight: " << getLeftWeight(root) << std::endl;
+    std::cout << "Right weight: " << getRightWeight(root) << std::endl;
+}
+
+template<class T> node<T> *Tree<T>::removePostRoot(node<T> *n, T val)
+{
+    if(n == NULL)
+    {
+        return n;
+    }
+
+    if(val < n->value)
+    {
+        n->left = removePostRoot(n->left,val);
+        return n;
+    }
+
+    if(val > n->value)
+    {
+        n->right = removePostRoot(n->right,val);
+        return n;
+    }
+
+    return deleteNode(n);
+}
+
+template<class T> node<T> *Tree<T>::deleteNode(node<T> *n)
+{
+    if(n->left == NULL && n->right == NULL)
+    {
+        return NULL;
+    }
+    else
+    {
+        if(n->left != NULL)
+        {
+            node<T> *temp = n->left;
+            n->left = deleteNode(n->left);
+            return temp;
+        }
+        else
+        {
+            node<T> *temp = n->right;
+            n->right = deleteNode(n->right);
+            return temp;
+        }
+    }
 }
 
 template<class T> void Tree<T>::startInOrder()

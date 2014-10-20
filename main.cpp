@@ -43,7 +43,29 @@ int main()
             else
             {
                 myTree.add(input);
-                std::cout << "Hi";
+            }
+        }
+
+        std::cout << "In order: " << std::endl;
+        myTree.startInOrder();
+        std::cout << std::endl;
+        std::cout << "Pre order: " << std::endl;
+        myTree.startPreOrder();
+        std::cout << std::endl;
+        std::cout << "Post order: " << std::endl;
+        myTree.startPostOrder();
+
+        std::cout << std::endl << "Starting deletions." << std::endl << std::endl;
+        while(true)
+        {
+            int input = getInt("Enter a value(-1 to quit): ");
+            if(input == -1)
+            {
+                break;
+            }
+            else
+            {
+                myTree.removeValue(input);
             }
         }
 
